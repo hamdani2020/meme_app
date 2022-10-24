@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.util.LruCache;
 
+import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.Volley;
@@ -31,9 +32,7 @@ public class MySingelton {
                     @Override
                     public void putBitmap(String url, Bitmap bitmap) {
                         cache.put(url, bitmap);
-
                     }
-
                 });
     }
 
@@ -53,7 +52,7 @@ public class MySingelton {
         return requestQueue;
     }
 
-    public <T> void addToRequestQueue(JsonObjectRequest req) {
+    public <T> void addToRequestQueue(Request<T> req) {
         getRequestQueue().add(req);
     }
 

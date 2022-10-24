@@ -3,8 +3,6 @@ package com.example.lusitechmemes;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.annotation.SuppressLint;
-import android.app.DownloadManager;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
@@ -16,10 +14,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
@@ -35,9 +35,9 @@ import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
     ImageView memeimage;
-    Button next, share;
+    Button next,share;
     ProgressBar progressBar;
-    String url;
+    public String url;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,13 +49,13 @@ public class MainActivity extends AppCompatActivity {
         memecall();
         next.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onClick(View v) {
                 memecall();
             }
         });
         share.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onClick(View v) {
                 try {
                     shareimage();
                 } catch (IOException e) {
@@ -65,9 +65,9 @@ public class MainActivity extends AppCompatActivity {
         });
     }
     public void memecall(){
-        url=" https://meme-api.herokuapp.com/gimme";
+        url="https://meme-api.herokuapp.com/gimme";
         progressBar.setVisibility(View.VISIBLE);
-          JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
                 (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
 
                     @Override
@@ -77,13 +77,13 @@ public class MainActivity extends AppCompatActivity {
                             Glide.with(MainActivity.this).load(url).listener(new RequestListener<Drawable>() {
                                 @Override
                                 public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
-                                    progressBar.setVisibility(View.VISIBLE);
+                                    progressBar.setVisibility(View.INVISIBLE);
                                     return false;
                                 }
 
                                 @Override
                                 public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-                                    progressBar.setVisibility(View.VISIBLE);
+                                    progressBar.setVisibility(View.INVISIBLE);
                                     return false;
                                 }
                             }).into(memeimage);
@@ -99,6 +99,7 @@ public class MainActivity extends AppCompatActivity {
 
                     }
                 });
+        // Access the RequestQueue through your singleton class.
         MySingelton.getInstance(this).addToRequestQueue(jsonObjectRequest);
     }
     public void shareimage() throws IOException {
@@ -109,13 +110,19 @@ public class MainActivity extends AppCompatActivity {
         File f=new File(getExternalCacheDir()+"/"+"LusiTech Memes"+".png");
         Intent shareimage=new Intent(Intent.ACTION_SEND);
         FileOutputStream outputStream =new FileOutputStream(f);
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100,outputStream);
+        bitmap.compress(Bitmap.CompressFormat.PNG,100,outputStream);
         outputStream.flush();
         outputStream.close();
         shareimage.setType("image/*");
-        shareimage.putExtra(Intent.EXTRA_TEXT, "Yo check out this meme from LusiTech");
+        shareimage.putExtra(Intent.EXTRA_TEXT,"Yo check out this meme from LusiTech");
         shareimage.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(f));
         shareimage.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(shareimage);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Toast.makeText(getApplicationContext(), "Welcome", Toast.LENGTH_SHORT).show();
     }
 }
